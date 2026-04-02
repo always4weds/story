@@ -264,7 +264,7 @@
 
     <script>
         // === App URL for Google Sheets Setup ===
-        const WEB_APP_URL = "PASTE_YOUR_GOOGLE_APPS_SCRIPT_URL_HERE";
+        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxp4GGT8tBV8bZglPlA8iB81_DXOOEP7w9VBJQYtojZAAuEd6En12S2VHH3db8wGTuG/exec"
 
         // === Navigation System ===
         function nav(targetId) {
@@ -273,29 +273,36 @@
         }
 
         // === Login & Validation ===
-        function handleLogin() {
-            const name = document.getElementById('inp-name').value.trim();
-            const age = document.getElementById('inp-age').value.trim();
-            const relation = document.getElementById('inp-relation').value.trim();
-            
-            if (!name || !age || !relation) {
-                const popup = document.getElementById('popup');
-                popup.classList.add('show');
-                setTimeout(() => popup.classList.remove('show'), 2000);
-            } else {
-                // Send data to Google Sheets silently in background
-                if(WEB_APP_URL !== "https://script.google.com/macros/s/AKfycbxp4GGT8tBV8bZglPlA8iB81_DXOOEP7w9VBJQYtojZAAuEd6En12S2VHH3db8wGTuG/exec") {
-                    fetch(WEB_APP_URL, {
-                        method: 'POST',
-                        mode: 'no-cors',
-                        headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify({ name: name, age: age, relation: relation })
-                    }).catch(err => console.log(err));
-                }
-                nav('page-menu');
-            }
-        }
+        // === Login & Validation ===
+function handleLogin() {
+    const name = document.getElementById('inp-name').value.trim();
+    const age = document.getElementById('inp-age').value.trim();
+    const relation = document.getElementById('inp-relation').value.trim();
+    
+    if (!name || !age || !relation) {
+        const popup = document.getElementById('popup');
+        popup.classList.add('show');
+        setTimeout(() => popup.classList.remove('show'), 2000);
+    } else {
+        if(WEB_APP_URL.includes("https")) {
+            // URLSearchParams format-e data pathano (Sobcheye safe method)
+            const params = new URLSearchParams();
+            params.append('name', name);
+            params.append('age', age);
+            params.append('relation', relation);
 
+            fetch(WEB_APP_URL, {
+                method: 'POST',
+                mode: 'no-cors', 
+                body: params
+            })
+            .then(() => console.log("Data sent successfully!"))
+            .catch(err => console.error("Error sending data:", err));
+        }
+        nav('page-menu');
+    }
+}
+        
         // === Generate 13 Episodes & Dynamic Audio Setup ===
         const episodeList = document.getElementById('episode-list');
         const audio = document.getElementById('audio-player');
